@@ -21,6 +21,174 @@ import {
 import { awardLanes, coreMechanicFilters, games, tasteMechanicFilters, years } from "./data/games";
 import "./styles.css";
 
+const COVER_BY_GAME = {
+  "colt-express-2015": {
+    "url": "https://cf.geekdo-images.com/2HKX0QANk_DY7CIVK5O5fQ__original/img/okv8rhQupsrXsEJsovQ_BJV5hKA=/0x0/filters:format(jpeg)/pic2869710.jpg",
+    "source": "https://boardgamegeek.com/boardgame/158899",
+    "name": "Colt Express"
+  },
+  "broom-service-2015": {
+    "url": "https://cf.geekdo-images.com/PcxTKtTwov2vxkZZbRVDAw__original/img/kjg4hSkTE2a8MKlkZNgTGqfKqgc=/0x0/filters:format(jpeg)/pic2546156.jpg",
+    "source": "https://boardgamegeek.com/boardgame/172308",
+    "name": "Broom Service"
+  },
+  "spinderella-2015": {
+    "url": "https://cf.geekdo-images.com/83b12oXwbrUmQQg0CrPuzg__original/img/2ZPsNKNjwXVMSzsckJFV8u7VoqA=/0x0/filters:format(jpeg)/pic2385041.jpg",
+    "source": "https://boardgamegeek.com/boardgame/171129",
+    "name": "Spinderella"
+  },
+  "codenames-2016": {
+    "url": "https://cf.geekdo-images.com/nC6ifPCDnAItwoKSKXVrnw__original/img/Id-jjIer_61ZbvI2_RVRCeBZFY4=/0x0/filters:format(jpeg)/pic8907965.jpg",
+    "source": "https://boardgamegeek.com/boardgame/178900",
+    "name": "Codenames"
+  },
+  "isle-of-skye-2016": {
+    "url": "https://cf.geekdo-images.com/GCxsnITFBO1pNXiBYkq_qA__original/img/8uoTbz4B_M1GbT4N3vGN-bhZF2Q=/0x0/filters:format(jpeg)/pic2524838.jpg",
+    "source": "https://boardgamegeek.com/boardgame/176494/isle-of-skye-from-chieftain-to-king",
+    "name": "Isle of Skye: From Chieftain to King"
+  },
+  "stone-age-junior-2016": {
+    "url": "https://cf.geekdo-images.com/H1aCQoaq0H9Qt91hOgc3Sw__original/img/WFYWAb7gD96COGI6JW10XCd_vPI=/0x0/filters:format(jpeg)/pic9005688.jpg",
+    "source": "https://boardgamegeek.com/boardgame/191004/my-first-stone-age",
+    "name": "My First Stone Age"
+  },
+  "kingdomino-2017": {
+    "url": "https://cf.geekdo-images.com/c0m3gwZTcfKoLI63ASio8g__original/img/HT6NQPT0cSFcZXjSewtjTO_NBAE=/0x0/filters:format(png)/pic8443569.png",
+    "source": "https://boardgamegeek.com/boardgame/204583",
+    "name": "Kingdomino"
+  },
+  "exit-2017": {
+    "url": "https://cf.geekdo-images.com/r7cZVZMpP28w3-JQ-EYY7g__original/img/t--VcMKvWX2__eZYvZ7d9V13nvw=/0x0/filters:format(jpeg)/pic3332426.jpg",
+    "source": "https://boardgamegeek.com/boardgame/203420/exit-the-game-the-abandoned-cabin",
+    "name": "EXIT: The Game"
+  },
+  "icecool-2017": {
+    "url": "https://cf.geekdo-images.com/xVx8ex1fjO9C7W8rRvWdVQ__original/img/rIyNSXqNgGs4Yqt0xL5CdTp9grg=/0x0/filters:format(png)/pic3320017.png",
+    "source": "https://boardgamegeek.com/boardgame/177524",
+    "name": "ICECOOL"
+  },
+  "azul-2018": {
+    "url": "https://cf.geekdo-images.com/aPSHJO0d0XOpQR5X-wJonw__original/img/AkbtYVc6xXJF3c9EUrakklcclKw=/0x0/filters:format(png)/pic6973671.png",
+    "source": "https://boardgamegeek.com/boardgame/230802",
+    "name": "Azul"
+  },
+  "quacks-2018": {
+    "url": "https://cf.geekdo-images.com/B1bLRWzTASZ-xx9NoAE79A__original/img/HulJk6gFzp_bxl0wzc2XEMq8NLM=/0x0/filters:format(png)/pic8780293.png",
+    "source": "https://boardgamegeek.com/boardgame/244521/quacks",
+    "name": "Quacks"
+  },
+  "funkelschatz-2018": {
+    "url": "https://cf.geekdo-images.com/CNKb5AGuOvx6VlbWQEV7wQ__original/img/OV3AWRelBb93_is3fzIp6Db81o8=/0x0/filters:format(jpeg)/pic5220396.jpg",
+    "source": "https://boardgamegeek.com/boardgame/235655/dragons-breath",
+    "name": "Dragon's Breath"
+  },
+  "just-one-2019": {
+    "url": "https://cf.geekdo-images.com/mHiOQYYPdSkM2xjEO3CNfA__original/img/z1F6yfBZVuLtOGw9_k7Fdv1ybTc=/0x0/filters:format(png)/pic8933221.png",
+    "source": "https://boardgamegeek.com/boardgame/450619",
+    "name": "Just One"
+  },
+  "wingspan-2019": {
+    "url": "https://cf.geekdo-images.com/yLZJCVLlIx4c7eJEWUNJ7w__original/img/cI782Zis9cT66j2MjSHKJGnFPNw=/0x0/filters:format(jpeg)/pic4458123.jpg",
+    "source": "https://boardgamegeek.com/boardgame/266192",
+    "name": "Wingspan"
+  },
+  "tal-der-wikinger-2019": {
+    "url": "https://cf.geekdo-images.com/qgy9RIPh2imFaDBl8el_eg__original/img/N0rs8_rYtwQlHj-pImoPuwuxEhQ=/0x0/filters:format(jpeg)/pic4803013.jpg",
+    "source": "https://boardgamegeek.com/boardgame/269526/valley-of-the-vikings",
+    "name": "Valley of the Vikings"
+  },
+  "pictures-2020": {
+    "url": "https://cf.geekdo-images.com/pR7dcr6bs5TIOHOhKIoe_A__original/img/YGaDDOA-Jtr9eS60TNUx51J36Ds=/0x0/filters:format(jpeg)/pic4946885.jpg",
+    "source": "https://boardgamegeek.com/boardgame/284108",
+    "name": "Pictures"
+  },
+  "the-crew-2020": {
+    "url": "https://cf.geekdo-images.com/98LnQShydr11OBKS46xY-Q__original/img/Q-ZkgnuBu9OTBr7J3qnqPjqamAE=/0x0/filters:format(jpeg)/pic5687013.jpg",
+    "source": "https://boardgamegeek.com/boardgame/284083",
+    "name": "The Crew: The Quest for Planet Nine"
+  },
+  "speedy-roll-2020": {
+    "url": "https://cf.geekdo-images.com/RZCgOQ6m2ZX_ePy-op9Svw__original/img/038LlceO23qXdIBv9CAhz7m6AGA=/0x0/filters:format(jpeg)/pic4561739.jpg",
+    "source": "https://boardgamegeek.com/boardgame/259830/hedgehog-roll",
+    "name": "Hedgehog Roll"
+  },
+  "micromacro-2021": {
+    "url": "https://cf.geekdo-images.com/bLL3P-G25nIUkFjHxfJfnw__original/img/HBEhgjfb0QcF9pFrdJ8VYhBapoU=/0x0/filters:format(jpeg)/pic7632081.jpg",
+    "source": "https://boardgamegeek.com/boardgame/318977",
+    "name": "MicroMacro: Crime City"
+  },
+  "paleo-2021": {
+    "url": "https://cf.geekdo-images.com/85t1wkwgvh3d2mmjsRcDrw__original/img/ejYTb1MVpf9optjLWlwbYua0TMk=/0x0/filters:format(jpeg)/pic6039256.jpg",
+    "source": "https://boardgamegeek.com/boardgame/300531",
+    "name": "Paleo"
+  },
+  "dragomino-2021": {
+    "url": "https://cf.geekdo-images.com/S_Cpk3j3Z3ceNJBPNg4l7w__original/img/2g1g35Rp3u1tF_8fX3YLpmjIPj8=/0x0/filters:format(png)/pic5212561.png",
+    "source": "https://boardgamegeek.com/boardgame/300010",
+    "name": "Dragomino"
+  },
+  "cascadia-2022": {
+    "url": "https://cf.geekdo-images.com/MjeJZfulbsM1DSV3DrGJYA__original/img/B374C04Eip7fmQBGJzgiOTp-jyQ=/0x0/filters:format(jpeg)/pic5100691.jpg",
+    "source": "https://boardgamegeek.com/boardgame/295947",
+    "name": "Cascadia"
+  },
+  "living-forest-2022": {
+    "url": "https://cf.geekdo-images.com/fPhdfZX9UTLr4-SVgK0zoQ__original/img/ZPdxDPt1jSRQMNnVgn-qIPhNv0E=/0x0/filters:format(jpeg)/pic5899025.jpg",
+    "source": "https://boardgamegeek.com/boardgame/328479",
+    "name": "Living Forest"
+  },
+  "zauberberg-2022": {
+    "url": "https://cf.geekdo-images.com/P44XaZ5uizRCH1gmodh9sg__original/img/JCDq2DfVMZnBf8xQKpaLCCNYB64=/0x0/filters:format(jpeg)/pic6348973.jpg",
+    "source": "https://boardgamegeek.com/boardgame/341919/magic-mountain",
+    "name": "Magic Mountain"
+  },
+  "dorfromantik-2023": {
+    "url": "https://cf.geekdo-images.com/Nqw3SzV4JDd64lcDgytPEg__original/img/CK6xh0d01jIC7WOIGALHZCDli34=/0x0/filters:format(jpeg)/pic7227691.jpg",
+    "source": "https://boardgamegeek.com/boardgame/370591",
+    "name": "Dorfromantik: The Board Game"
+  },
+  "challengers-2023": {
+    "url": "https://cf.geekdo-images.com/GtLESZ4ZjqikK12bjBTmig__original/img/CHUtcmSXFs8LYKRHyUaeio2ra4U=/0x0/filters:format(jpeg)/pic7040521.jpg",
+    "source": "https://boardgamegeek.com/boardgame/359970",
+    "name": "Challengers!"
+  },
+  "mysterium-kids-2023": {
+    "url": "https://cf.geekdo-images.com/3PLNZOg5ZEVf9u121faEbw__original/img/J_D8TkWJfM4xFoWdoEmKKpXANck=/0x0/filters:format(jpeg)/pic7075722.jpg",
+    "source": "https://boardgamegeek.com/boardgame/367206/mysterium-kids-captain-echos-treasure",
+    "name": "Mysterium Kids: Captain Echo's Treasure"
+  },
+  "sky-team-2024": {
+    "url": "https://cf.geekdo-images.com/uXMeQzNenHb3zK7Hoa6b2w__original/img/mWOQnkpyYBorh_Y1-0Y2o-ew17k=/0x0/filters:format(jpeg)/pic7398904.jpg",
+    "source": "https://boardgamegeek.com/boardgame/373106",
+    "name": "Sky Team"
+  },
+  "daybreak-2024": {
+    "url": "https://cf.geekdo-images.com/YU8rm_FMnKHS2GPDFvLb6g__original/img/6umYavtw4Iw41gTtBZhNS7LrKIA=/0x0/filters:format(png)/pic7068528.png",
+    "source": "https://boardgamegeek.com/boardgame/334986",
+    "name": "Daybreak"
+  },
+  "magic-keys-2024": {
+    "url": "https://cf.geekdo-images.com/du6vq9YnLlsIqv2Zh4yXFQ__original/img/j0ml7S2hQl24qXO4BzTmZ0KJhTM=/0x0/filters:format(png)/pic8256181.png",
+    "source": "https://boardgamegeek.com/boardgame/368899/magic-keys",
+    "name": "Magic Keys"
+  },
+  "bomb-busters-2025": {
+    "url": "https://cf.geekdo-images.com/HpGXIlt5i6T-0jbiQRReOg__original/img/2uApg8IOYjNVSzbUIwJUa-Z8eL8=/0x0/filters:format(png)/pic8303080.png",
+    "source": "https://boardgamegeek.com/boardgame/413246",
+    "name": "Bomb Busters"
+  },
+  "deep-sea-2025": {
+    "url": "https://cf.geekdo-images.com/wIbevITv9W79ELP8rEZoKA__original/img/41fYEG_IYb9ECcCO24Dk4dZUNT0=/0x0/filters:format(jpeg)/pic6996584.jpg",
+    "source": "https://boardgamegeek.com/boardgame/367966",
+    "name": "Endeavor: Deep Sea"
+  },
+  "topp-die-torte-2025": {
+    "url": "https://cf.geekdo-images.com/dIHh1q19kHUJnAeCdANNvg__original/img/xZXK_v1K-RnaCSxeo7-jaj_d7vg=/0x0/filters:format(jpeg)/pic9482179.jpg",
+    "source": "https://boardgamegeek.com/boardgame/423232/cherry-on-the-cake",
+    "name": "Cherry on the Cake"
+  }
+};
+
 const defaultGameId = "sky-team-2024";
 const wizardHatUrl = "https://wizardsoflearning.com/wizards-hat-board-game-design-tools/";
 const assetPath = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, "")}`;
@@ -388,6 +556,15 @@ function GalleryView({ visibleGames, selectedGame, selectedGameId, onSelectGame,
 }
 
 function GameBoxArt({ game, compact = false }) {
+  const [failedUrl, setFailedUrl] = useState(null);
+  const cover = COVER_BY_GAME[game.id];
+  if (cover && failedUrl !== cover.url) {
+    return (
+      <div className={`game-box-art ${compact ? "compact" : ""}`} style={{ background: "#fff", height: compact ? 42 : 220 }}>
+        <img src={cover.url} alt={`หน้ากล่องเกม ${game.title}`} loading="lazy" onError={() => setFailedUrl(cover.url)} style={{ objectFit: "contain" }} />
+      </div>
+    );
+  }
   const Icon = getVerbIcon(game);
   if (compact) {
     return (
@@ -422,7 +599,7 @@ function CoverStatus({ game }) {
   return (
     <a
       className="cover-status review"
-      href={game.coverSourceUrl}
+      href={COVER_BY_GAME[game.id]?.source ?? game.coverSourceUrl}
       target="_blank"
       rel="noreferrer"
       onClick={(e) => e.stopPropagation()}
@@ -502,9 +679,9 @@ function GameDetail({ game }) {
 
       <div className="source-card">
         <span>Cover source</span>
-        {game.coverSourceUrl ? (
-          <a href={game.coverSourceUrl} target="_blank" rel="noreferrer">
-            {game.coverCredit ?? "Source pending review"} <ExternalLink size={14} />
+        {(COVER_BY_GAME[game.id]?.source || game.coverSourceUrl) ? (
+          <a href={COVER_BY_GAME[game.id]?.source ?? game.coverSourceUrl} target="_blank" rel="noreferrer">
+            {game.id === "just-one-2019" ? "BGG · ภาพฉบับใหม่ 2025" : game.id === "exit-2017" ? "BGG · ภาพตัวอย่างจากชุด EXIT" : "BGG · ภาพตัวอย่าง"} <ExternalLink size={14} />
           </a>
         ) : (
           <p>ยังไม่มีแหล่งรูปที่ตรวจสอบได้</p>
@@ -694,3 +871,5 @@ createRoot(document.getElementById("root")).render(
     <App />
   </React.StrictMode>
 );
+
+
