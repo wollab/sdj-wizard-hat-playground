@@ -560,8 +560,8 @@ function GameBoxArt({ game, compact = false }) {
   const cover = COVER_BY_GAME[game.id];
   if (cover && failedUrl !== cover.url) {
     return (
-      <div className={`game-box-art ${compact ? "compact" : ""}`} style={{ background: "#fff", height: compact ? 42 : 220 }}>
-        <img src={cover.url} alt={`หน้ากล่องเกม ${game.title}`} loading="lazy" onError={() => setFailedUrl(cover.url)} style={{ objectFit: "contain" }} />
+      <div className={`game-box-art ${compact ? "compact" : ""}`} style={{ background: "#fff", display: "block", height: compact ? 42 : 220 }}>
+        <img src={cover.url} alt={`หน้ากล่องเกม ${game.title}`} loading="lazy" onError={() => setFailedUrl(cover.url)} style={{ display: "block", width: "100%", height: "100%", objectFit: "contain" }} />
       </div>
     );
   }
