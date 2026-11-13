@@ -20,6 +20,10 @@ import {
 } from "lucide-react";
 import { awardLanes, coreMechanicFilters, games, tasteMechanicFilters, years } from "./data/games";
 import "./styles.css";
+import TimelineExplorer from "./TimelineExplorer.jsx";
+import GalleryExplorer from "./GalleryExplorer.jsx";
+import "./explorer-redesign.css";
+
 
 const COVER_BY_GAME = {
   "colt-express-2015": {
@@ -194,11 +198,36 @@ const wizardHatUrl = "https://wizardsoflearning.com/wizards-hat-board-game-desig
 const assetPath = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, "")}`;
 
 const modules = [
-  { id: "explore", title: "Award Explorer", shortTitle: "Explore", status: "Active", icon: Award, text: "Timeline, award lanes, and game analysis." },
-  { id: "gallery", title: "Game Box Gallery", shortTitle: "Gallery", status: "New", icon: GalleryHorizontalEnd, text: "All winners as a visual cover wall." },
-  { id: "lab", title: "Wizard Hat Lab", shortTitle: "Lab", status: "Beta", icon: FlaskConical, text: "Sort CORE/TASTE cards by real award patterns." },
+  { id: "explore", title: "Timeline", shortTitle: "Timeline", status: "Active", icon: Award, text: "Explore winners and mechanics year by year." },
+  { id: "gallery", title: "Game Gallery", shortTitle: "Gallery", status: "New", icon: GalleryHorizontalEnd, text: "Discover award-winning games." },
+  { id: "lab", title: "Mechanic Library", shortTitle: "Mechanics", status: "Beta", icon: FlaskConical, text: "Understand mechanics through real award-winning games." },
   { id: "challenge", title: "Design Challenge", shortTitle: "Challenge", status: "Next", icon: Gamepad2, text: "Turn a winner pattern into a new design prompt." },
 ];
+
+const MECHANIC_DESCRIPTIONS = {
+  "co-operation": "ผู้เล่นทำงานร่วมกันเพื่อให้บรรลุเป้าหมายของเกม",
+  "competitive": "ผู้เล่นแข่งขันเพื่อให้ได้คะแนนหรือผลลัพธ์เหนือกว่าคนอื่น",
+  "fixed-turn-order": "ผู้เล่นผลัดกันเล่นตามลำดับคงที่",
+  "simultaneous-action-selection": "ทุกคนเลือกสิ่งที่จะทำก่อนเปิดเผยผลพร้อมกัน",
+  "dynamic-order": "ลำดับการเล่นเปลี่ยนได้ตามเงื่อนไขหรือการตัดสินใจ",
+  "mission-success": "ผู้เล่นต้องทำภารกิจตามเป้าหมายให้สำเร็จ",
+  "victory-points": "เกมใช้คะแนนสะสมเพื่อกำหนดผู้ชนะ",
+  "fixed-number-rounds": "เกมสิ้นสุดเมื่อครบจำนวนรอบที่กำหนด",
+  "completing-targets": "เกมสิ้นสุดเมื่อมีการทำเป้าหมายครบตามเงื่อนไข",
+  "exhausting-resources": "เกมสิ้นสุดเมื่อทรัพยากรที่กำหนดหมดลง",
+  "communication-limits": "สร้างความท้าทายด้วยข้อจำกัดในการส่งข้อมูลระหว่างผู้เล่น",
+  "tile-laying": "นำชิ้นส่วนมาวางต่อกันเพื่อสร้างพื้นที่ รูปแบบ หรือการให้คะแนน",
+  "deduction": "ใช้หลักฐานที่มีเพื่ออนุมานข้อมูลที่ยังไม่รู้",
+  "dexterity": "นำทักษะการเคลื่อนไหวและการควบคุมอุปกรณ์มาเป็นส่วนหนึ่งของเกม",
+  "push-your-luck": "เลือกระหว่างหยุดเพื่อรักษาผลตอบแทน หรือเสี่ยงต่อเพื่อได้มากขึ้น",
+  "engine-building": "สร้างระบบความสามารถที่ส่งผลต่อเนื่องและแข็งแกร่งขึ้นในแต่ละรอบ",
+  "drafting": "เลือกการ์ดหรือทรัพยากรจากตัวเลือกที่มีจำกัด",
+  "set-collection": "สะสมชุดสิ่งของหรือการ์ดเพื่อรับคะแนนหรือผลประโยชน์",
+  "targeted-clues": "ให้คำใบ้ที่มีความหมายเพื่อช่วยให้ผู้อื่นตีความเป้าหมาย",
+  "output-randomness": "ความไม่แน่นอนเกิดขึ้นหลังผู้เล่นเลือกการกระทำ",
+  "hand-management": "จัดลำดับว่าจะใช้หรือเก็บการ์ดในมือเพื่อจังหวะที่เหมาะสม",
+  "worker-placement": "วางตัวแทนของผู้เล่นลงบนช่องการกระทำเพื่อรับผลต่าง ๆ",
+};
 
 function App() {
   const [activeModule, setActiveModule] = useState("explore");
@@ -207,117 +236,108 @@ function App() {
   const [selectedMechanic, setSelectedMechanic] = useState("all");
   const [mechanicSort, setMechanicSort] = useState("frequent");
   const [selectedYear, setSelectedYear] = useState("all");
+  const [timelineYear, setTimelineYear] = useState(years[years.length - 1]);
   const [query, setQuery] = useState("");
+  const [labGameId, setLabGameId] = useState("");
   const deferredQuery = useDeferredValue(query);
   const allMechanicFilters = [...coreMechanicFilters, ...tasteMechanicFilters];
-
   const selectedGame = games.find((game) => game.id === selectedGameId) ?? games[0];
+  const selectedFilter = allMechanicFilters.find((filter) => filter.id === selectedMechanic);
+
   const visibleGames = games.filter((game) => {
     const matchesLane = selectedLane === "all" || game.lane === selectedLane;
     const matchesYear = selectedYear === "all" || game.year === Number(selectedYear);
-    const selectedMechanicCard = allMechanicFilters.find((filter) => filter.id === selectedMechanic);
-    const matchesMechanic = selectedMechanic === "all" || gameMatchesMechanic(game, selectedMechanicCard);
+    const matchesMechanic = selectedMechanic === "all" || gameMatchesMechanic(game, selectedFilter);
     const searchText = [
-      game.title,
-      game.year,
-      game.verb,
-      game.tableMoment,
-      game.core.conflict,
-      game.core.order,
-      game.core.win,
-      game.core.end,
+      game.title, game.year, game.verb, game.tableMoment,
+      game.magic?.mood, game.magic?.action, game.lesson,
+      game.core.conflict, game.core.order, game.core.win, game.core.end,
       game.taste.map((taste) => taste.name).join(" "),
     ].join(" ").toLowerCase();
-    const matchesQuery = searchText.includes(deferredQuery.trim().toLowerCase());
-    return matchesLane && matchesYear && matchesMechanic && matchesQuery;
+    return matchesLane && matchesYear && matchesMechanic && searchText.includes(deferredQuery.trim().toLowerCase());
   });
 
-  const selectedFilter = allMechanicFilters.find((filter) => filter.id === selectedMechanic);
-  const countedCoreFilters = sortMechanics(coreMechanicFilters.map((filter) => ({ ...filter, count: countMechanicMatches(filter) })), mechanicSort);
-  const countedTasteFilters = sortMechanics(tasteMechanicFilters.map((filter) => ({ ...filter, count: countMechanicMatches(filter) })), mechanicSort);
+  const countedCoreFilters = sortMechanics(coreMechanicFilters.map((filter) => ({
+    ...filter, count: games.filter((game) => gameMatchesMechanic(game, filter)).length,
+  })), mechanicSort);
+  const countedTasteFilters = sortMechanics(tasteMechanicFilters.map((filter) => ({
+    ...filter, count: games.filter((game) => gameMatchesMechanic(game, filter)).length,
+  })), mechanicSort);
 
-  function countMechanicMatches(filter) {
-    return games.filter((game) => gameMatchesMechanic(game, filter)).length;
-  }
-
-  function resetView() {
-    setSelectedMechanic("all");
-    setSelectedLane("all");
-    setSelectedYear("all");
-    setQuery("");
-  }
+  const labGames = games.filter((game) => selectedMechanic === "all" || gameMatchesMechanic(game, selectedFilter));
+  const labSelectedGame = labGames.find((game) => game.id === labGameId);
 
   function selectGame(gameId, nextModule = activeModule) {
     setSelectedGameId(gameId);
     setActiveModule(nextModule);
   }
 
+  function openMechanic(cardId) {
+    setSelectedMechanic(cardId);
+    setLabGameId("");
+    setActiveModule("lab");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   return (
-    <div className="app-shell">
+    <div className="app-shell redesigned-explorer">
       <main className="workspace">
-        <SiteHeader activeModule={activeModule} onModuleChange={setActiveModule} />
-        <Hero
-          query={query}
-          selectedYear={selectedYear}
-          onQueryChange={setQuery}
-          onYearChange={setSelectedYear}
-          onModuleChange={setActiveModule}
-        />
-
-        <ModuleStrip activeModule={activeModule} onModuleChange={setActiveModule} />
-        <FilterBar
-          selectedLane={selectedLane}
-          selectedFilter={selectedFilter}
-          visibleCount={visibleGames.length}
-          onLaneChange={setSelectedLane}
-        />
-
+        <SiteHeader activeModule={activeModule} onModuleChange={(module) => {
+          setActiveModule(module);
+          setLabGameId("");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}/>
         {activeModule === "explore" && (
-          <ExplorerView
-            visibleGames={visibleGames}
-            selectedGame={selectedGame}
-            selectedGameId={selectedGameId}
-            onSelectGame={(gameId) => selectGame(gameId, "explore")}
-            onReset={resetView}
+          <TimelineExplorer
+            games={games} years={years} lanes={awardLanes} filters={allMechanicFilters}
+            year={timelineYear} onYearChange={setTimelineYear}
+            selectedLane={selectedLane} onLaneChange={setSelectedLane}
+            selectedGame={selectedGame} onSelectGame={(id) => selectGame(id, "explore")}
+            onShowLab={openMechanic} GameArt={GameBoxArt} GameDetail={GameDetail}
           />
         )}
-
         {activeModule === "gallery" && (
-          <GalleryView
-            visibleGames={visibleGames}
-            selectedGame={selectedGame}
-            selectedGameId={selectedGameId}
-            onSelectGame={(gameId) => selectGame(gameId, "gallery")}
-            onReset={resetView}
-          />
-        )}
-
-        {activeModule === "lab" && (
-          <LabView
-            selectedMechanic={selectedMechanic}
-            mechanicSort={mechanicSort}
-            countedCoreFilters={countedCoreFilters}
-            countedTasteFilters={countedTasteFilters}
-            onSelectMechanic={setSelectedMechanic}
-            onSortChange={setMechanicSort}
-          />
-        )}
-
-        {activeModule === "challenge" && <ChallengeView game={selectedGame} onModuleChange={setActiveModule} />}
-
-        {activeModule !== "lab" && (
-          <PatternPreview
-            selectedMechanic={selectedMechanic}
-            mechanicSort={mechanicSort}
-            countedCoreFilters={countedCoreFilters}
-            countedTasteFilters={countedTasteFilters}
-            onSelectMechanic={setSelectedMechanic}
-            onSortChange={setMechanicSort}
+          <GalleryExplorer
+            visibleGames={visibleGames} years={years} lanes={awardLanes} filters={allMechanicFilters}
+            query={query} onQueryChange={setQuery}
+            selectedYear={selectedYear} onYearChange={setSelectedYear}
+            selectedLane={selectedLane} onLaneChange={setSelectedLane}
+            selectedMechanic={selectedMechanic} onSelectMechanic={setSelectedMechanic}
+            selectedGame={selectedGame} onSelectGame={(id) => selectGame(id, "gallery")}
             onOpenLab={() => setActiveModule("lab")}
+            GameArt={GameBoxArt} GameDetail={GameDetail}
           />
         )}
-
-        <SourceFooter />
+        {activeModule === "lab" && (
+          <>
+            <LabView
+              selectedMechanic={selectedMechanic} mechanicSort={mechanicSort}
+              countedCoreFilters={countedCoreFilters} countedTasteFilters={countedTasteFilters}
+              onSelectMechanic={(id) => { setSelectedMechanic(id); setLabGameId(""); }}
+              onSortChange={setMechanicSort}
+            />
+            <section className="discovery-panel discovery-lab-results" aria-live="polite">
+              <span className="discovery-eyebrow">LEARN FROM REAL GAMES</span>
+              <h2>{selectedFilter ? selectedFilter.shortLabel || selectedFilter.label : "ตัวอย่างกลไกจากเกมรางวัล"}</h2>
+              <p>{selectedFilter
+                ? MECHANIC_DESCRIPTIONS[selectedFilter.id] || "สำรวจว่าเกมรางวัลต่าง ๆ นำกลไกนี้ไปสร้างประสบการณ์อย่างไร"
+                : "เลือกการ์ด Wizard Hat ด้านบนเพื่อดูความหมายและตัวอย่างเกมที่ใช้กลไกนั้น"}</p>
+              <div className="discovery-lab-game-grid">
+                {labGames.map((game) => (
+                  <button type="button" key={game.id} onClick={() => setLabGameId(game.id)}
+                    className={labSelectedGame?.id === game.id ? "active" : ""}>
+                    <GameBoxArt game={game} compact/>
+                    <span><strong>{game.title}</strong><small>{game.year} · {game.tableMoment}</small></span>
+                    <ChevronRight size={16}/>
+                  </button>
+                ))}
+              </div>
+              {labSelectedGame && <div className="discovery-lab-detail"><GameDetail game={labSelectedGame}/></div>}
+            </section>
+          </>
+        )}
+        {activeModule === "challenge" && <ChallengeView game={selectedGame} onModuleChange={setActiveModule}/>}
+        <SourceFooter/>
       </main>
     </div>
   );
@@ -786,7 +806,7 @@ function MechanicSection({ title, description, filters, selectedMechanic, onSele
             onClick={() => onSelect(filter.id)}
           >
             <div className="card-thumb">
-              <img src={assetPath(`wizard-cards/${filter.card}`)} alt="" loading="lazy" />
+              {filter.card ? <img src={assetPath(`wizard-cards/${filter.card}`)} alt="" loading="lazy" /> : <span className="card-image-unmapped" aria-label="กลุ่มวิเคราะห์ ไม่ใช่การ์ด Wizard Hat โดยตรง"><Puzzle size={28} /><small>Analysis group</small></span>}
             </div>
             <div className="mechanic-card-copy">
               <span>{filter.shortLabel ?? filter.label}</span>
