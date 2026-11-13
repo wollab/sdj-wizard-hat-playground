@@ -806,7 +806,7 @@ function MechanicSection({ title, description, filters, selectedMechanic, onSele
             onClick={() => onSelect(filter.id)}
           >
             <div className="card-thumb">
-              <img src={assetPath(`wizard-cards/${filter.card}`)} alt="" loading="lazy" />
+              {filter.card ? <img src={assetPath(`wizard-cards/${filter.card}`)} alt="" loading="lazy" /> : <span className="card-image-unmapped" aria-label="กลุ่มวิเคราะห์ ไม่ใช่การ์ด Wizard Hat โดยตรง"><Puzzle size={28} /><small>Analysis group</small></span>}
             </div>
             <div className="mechanic-card-copy">
               <span>{filter.shortLabel ?? filter.label}</span>
