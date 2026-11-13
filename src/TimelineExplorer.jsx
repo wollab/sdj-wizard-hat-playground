@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, BarChart3, BookOpen, ChevronDown, 
 
 const CORE_FIELDS = [
   ["conflict", "Conflict"],
-  ["order", "Turn Order"],
+  ["order", "Order"],
   ["win", "Win Condition"],
   ["end", "End Trigger"],
 ];
