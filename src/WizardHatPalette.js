@@ -15,6 +15,9 @@ export const CARD_SAMPLES = {
   Engage: 24,
 };
 
+// Asset is the blue card family. Pin its visual accent so image sampling cannot turn it green.
+const CATEGORY_COLOR_OVERRIDES = Object.freeze({ Asset: "#298DD0" });
+
 export const CORE_CATEGORIES = ["Conflict", "Order", "Win Condition", "End Trigger"];
 export const TASTE_CATEGORIES = ["Touch", "Asset", "Strategy", "Twist", "Engage"];
 
@@ -65,10 +68,11 @@ function sampleAccent(img) {
 }
 
 export function useWizardHatPalette() {
-  const [palette, setPalette] = useState({});
+  const [palette, setPalette] = useState(CATEGORY_COLOR_OVERRIDES);
   useEffect(() => {
     let cancelled = false;
     for (const category of Object.keys(CARD_SAMPLES)) {
+      if (CATEGORY_COLOR_OVERRIDES[category]) continue;
       const img = new Image();
       img.onload = () => {
         try {
