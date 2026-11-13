@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { cardImage, CORE_CATEGORIES, TASTE_CATEGORIES, useWizardHatPalette } from "./WizardHatPalette.js";
 import { ArrowLeft, ArrowRight, ArrowUpRight, BarChart3, BookOpen, ChevronDown, ChevronUp, Layers3, Sparkles, Trophy } from "lucide-react";
 
 const CORE_FIELDS = [
@@ -52,6 +53,9 @@ export default function TimelineExplorer({
   const [mode, setMode] = useState("year");
   const [focus, setFocus] = useState("");
   const [expanded, setExpanded] = useState(false);
+  const [expandedCore, setExpandedCore] = useState(false);
+  const [expandedTaste, setExpandedTaste] = useState(false);
+  const cardPalette = useWizardHatPalette();
 
   const yearGames = useMemo(
     () => games.filter((game) => game.year === Number(year) && (selectedLane === "all" || game.lane === selectedLane)),
@@ -70,10 +74,19 @@ export default function TimelineExplorer({
   const taste = yearEntries.filter((entry) => entry.kind === "TASTE");
   const core = yearEntries.filter((entry) => entry.kind === "CORE");
 
-  const trendEntries = useMemo(() => {
+  const allComparisonEntries = useMemo(() => {
     const scopedGames = games.filter((game) => selectedLane === "all" || game.lane === selectedLane);
-    return getEntries(scopedGames).filter((entry) => entry.kind === "TASTE").slice(0, 12);
+    return getEntries(scopedGames);
   }, [games, selectedLane]);
+
+  const categoryTrendGroups = {
+    CORE: CORE_CATEGORIES.map((category) => ({
+      category, entries: allComparisonEntries.filter((entry) => entry.kind === "CORE" && entry.category === category),
+    })),
+    TASTE: TASTE_CATEGORIES.map((category) => ({
+      category, entries: allComparisonEntries.filter((entry) => entry.kind === "TASTE" && entry.category === category),
+    })),
+  };
 
   function chooseYear(nextYear, focusKey = "") {
     onYearChange(Number(nextYear));
@@ -94,6 +107,98 @@ export default function TimelineExplorer({
         <span className="discovery-mechanic-count">{entry.gameIds.length} เกม</span>
       </button>
     ));
+  }
+
+
+  function renderComparison(kind) {
+    const isCore = kind === "CORE";
+    const expanded = isCore ? expandedCore : expandedTaste;
+    const setExpandedSection = isCore ? setExpandedCore : setExpandedTaste;
+    const groups = categoryTrendGroups[kind];
+    const maxRows = isCore ? 4 : 3;
+    const totalEntries = groups.reduce((sum, group) => sum + group.entries.length, 0);
+    const hasHidden = groups.some((group) => group.entries.length > maxRows);
+    return (
+      <section className="discovery-comparison-section" aria-label={kind + " mechanic comparison"}>
+        <div className="discovery-comparison-heading">
+          <div>
+            <span className="discovery-eyebrow">{isCore ? "GAME STRUCTURE" : "PLAYER EXPERIENCE"}</span>
+            <h3>{kind} · {isCore ? "โครงสร้างของเกม" : "กลไกสร้างประสบการณ์"}</h3>
+            <p>{isCore
+              ? "Conflict, Order, Win Condition และ End Trigger คือโครงสร้างหลักของการเล่น"
+              : "Touch, Asset, Strategy, Twist และ Engage เพิ่มรสชาติและรูปแบบประสบการณ์"}</p>
+          </div>
+          <span>{totalEntries} รูปแบบในชุดข้อมูล</span>
+        </div>
+        <div className="discovery-card-legend" aria-label={"กลุ่มสีการ์ด " + kind}>
+          {groups.map((group) => (
+            <div key={group.category} className="discovery-card-legend-item"
+              style={{ "--hat-color": cardPalette[group.category] || "#8ca9a4" }}>
+              <img src={cardImage(group.category)} alt="" loading="lazy" />
+              <span>{group.category}</span>
+            </div>
+          ))}
+        </div>
+        <div className="discovery-trend-scroll">
+          <table className="discovery-heatmap discovery-card-heatmap">
+            <thead>
+              <tr>
+                <th scope="col">ประเภท / กลไก</th>
+                {years.map((item) => <th scope="col" key={item}>{item}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {groups.map((group) => {
+                const shownEntries = expanded ? group.entries : group.entries.slice(0, maxRows);
+                const style = { "--hat-color": cardPalette[group.category] || "#8ca9a4" };
+                return (
+                  <React.Fragment key={group.category}>
+                    <tr className="discovery-category-header" style={style}>
+                      <th colSpan={years.length + 1} scope="rowgroup">
+                        <span className="discovery-category-heading">
+                          <img src={cardImage(group.category)} alt="" loading="lazy" />
+                          <strong>{group.category}</strong>
+                          <small>{group.entries.length} กลไก</small>
+                        </span>
+                      </th>
+                    </tr>
+                    {shownEntries.map((entry) => (
+                      <tr key={entry.key} className="discovery-category-data-row" style={style}>
+                        <th scope="row">{entry.label}</th>
+                        {years.map((item) => {
+                          const count = games.filter((game) =>
+                            game.year === item && (selectedLane === "all" || game.lane === selectedLane) &&
+                            (isCore ? game.core[entry.field] === entry.label
+                              : game.taste.some((tasteItem) => tasteItem.name === entry.label))
+                          ).length;
+                          return (
+                            <td key={item}>
+                              <button type="button" disabled={!count}
+                                className={"discovery-heat discovery-card-heat " + (count ? "level-" + count : "")}
+                                aria-label={group.category + ": " + entry.label + ", ปี " + item + ", " + count + " เกม"}
+                                title={entry.label + " · " + item + " · " + count + " เกม"}
+                                onClick={() => { chooseYear(item, entry.key); setMode("year"); }}>
+                                {count || "·"}
+                              </button>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        {hasHidden && (
+          <button type="button" className="discovery-comparison-more" onClick={() => setExpandedSection(!expanded)}>
+            {expanded ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
+            {expanded ? "ย่อรายการ " + kind : "แสดงกลไก " + kind + " ทั้งหมด"}
+          </button>
+        )}
+      </section>
+    );
   }
 
   return (
@@ -213,30 +318,13 @@ export default function TimelineExplorer({
         ) : (
           <div className="discovery-trends">
             <div className="discovery-section-title">
-              <h3>กลไกที่พบในเกมรางวัลแต่ละปี</h3>
-              <span>12 กลไก TASTE ที่พบบ่อยในชุดข้อมูล</span>
+              <h3>เปรียบเทียบกลไกในเกมรางวัลแต่ละปี</h3>
+              <span>CORE + TASTE · 2015–2025</span>
             </div>
-            <p>ตัวเลขแสดงจำนวนเกมที่ใช้กลไกนั้นในแต่ละปี (สูงสุด 3 เกมเมื่อเลือกทุกรางวัล) คลิกช่องที่มีข้อมูลเพื่อย้อนกลับไปดูเกมจริง</p>
-            <div className="discovery-trend-scroll">
-              <table className="discovery-heatmap">
-                <thead><tr><th scope="col">กลไก</th>{years.map((item) => <th scope="col" key={item}>{item}</th>)}</tr></thead>
-                <tbody>
-                  {trendEntries.map((entry) => (
-                    <tr key={entry.key}>
-                      <th scope="row">{entry.label}</th>
-                      {years.map((item) => {
-                        const count = games.filter((game) => game.year === item && (selectedLane === "all" || game.lane === selectedLane)
-                          && game.taste.some((tasteItem) => tasteItem.name === entry.label)).length;
-                        return <td key={item}><button type="button" disabled={!count} className={"discovery-heat " + (count ? "level-" + count : "")}
-                          aria-label={entry.label + " ปี " + item + " พบ " + count + " เกม"}
-                          onClick={() => { chooseYear(item, entry.key); setMode("year"); }}>{count || "·"}</button></td>;
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p className="discovery-caveat"><Sparkles size={15}/> จำนวนนี้อ้างอิงเฉพาะเกมที่ชนะรางวัลในชุดข้อมูลปี 2015–2025 ไม่ใช่สถิติของอุตสาหกรรมเกมทั้งหมด</p>
+            <p>กลุ่มสีอ้างอิงจากภาพการ์ด Wizard Hat จริงใน Learning Game Atlas แต่ละช่องแสดงจำนวนเกมที่ใช้กลไกนั้นในปีที่เลือก คลิกตัวเลขเพื่อดูเกมตัวอย่างได้</p>
+            {renderComparison("CORE")}
+            {renderComparison("TASTE")}
+            <p className="discovery-caveat"><Sparkles size={15}/> ข้อมูลนี้ครอบคลุมเฉพาะเกมผู้ชนะรางวัลในชุดข้อมูลปี 2015–2025 ไม่ใช่สถิติของอุตสาหกรรมบอร์ดเกมทั้งหมด</p>
           </div>
         )}
       </section>
