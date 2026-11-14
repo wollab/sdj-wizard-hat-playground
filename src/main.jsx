@@ -657,6 +657,12 @@ function GameDetail({ game }) {
         <ChevronRight size={20} />
       </div>
 
+      <InfoBlock icon={<BookOpen size={18} />} title="สถานะหลักฐาน">
+        <p>{game.evidence
+          ? "ตรวจจากคู่มือผู้จัดพิมพ์ · ระบุฉบับและหัวข้อให้ตรวจย้อนกลับได้"
+          : "บทวิเคราะห์เดิม · หน้านี้ยังไม่มีการอ้างคู่มือเฉพาะเกมประกอบข้อสรุป"}</p>
+      </InfoBlock>
+
       {game.evidence ? (
         <>
           <InfoBlock icon={<Layers3 size={18} />} title="กติกาที่ตรวจได้">
@@ -673,9 +679,9 @@ function GameDetail({ game }) {
           </InfoBlock>
         </>
       ) : (
-      <InfoBlock icon={<Sparkles size={18} />} title="Why people want to play">
+      <InfoBlock icon={<Sparkles size={18} />} title="สมมติฐานของ WoL: จังหวะไหนที่น่าลองเล่น">
         <p>
-          Players repeat the verb <strong>{game.verb}</strong> because the table moment is <strong>{game.tableMoment}</strong>.
+          สิ่งที่ผู้เล่นทำซ้ำ: <strong>{game.verb}</strong> · จังหวะบนโต๊ะที่น่าสังเกต: <strong>{game.tableMoment}</strong>
         </p>
       </InfoBlock>
 
@@ -877,12 +883,16 @@ function SourceFooter() {
       <div>
         <BookOpen size={18} />
         <p>
-          Game analysis is a WoL learning resource. Cover slots keep source status visible; BGG links are used as review references where available.
+          WoL วิเคราะห์เกมผู้ชนะสามสาขา ช่วง {years[0]}–{years.at(-1)} เพื่อเป็นตัวอย่างสำหรับนักออกแบบ ป้าย CORE/TASTE และ MAGIC Star เป็นการจัดหมวดของ WoL ส่วนความถี่ใช้เปรียบเทียบเฉพาะเกมในคลังนี้
         </p>
       </div>
       <a href={wizardHatUrl} target="_blank" rel="noreferrer">
         Continue with Wizard Hat <ExternalLink size={14} />
       </a>
+      <details>
+        <summary>บันทึกการปรับปรุงข้อมูล</summary>
+        <p><time dateTime="2026-11-14">14 พ.ย. 2026</time> — เพิ่มเกมผู้ชนะปี 2026 ทั้งสามสาขา พร้อมคู่มือและฉบับที่ใช้อ้างอิง และระบุสถานะหลักฐานของบทวิเคราะห์ปีก่อน</p>
+      </details>
     </footer>
   );
 }
