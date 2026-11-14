@@ -19,6 +19,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { awardLanes, coreMechanicFilters, games, tasteMechanicFilters, years } from "./data/games";
+import { awardSource2026 } from "./data/winners2026.js";
 import "./styles.css";
 import TimelineExplorer from "./TimelineExplorer.jsx";
 import GalleryExplorer from "./GalleryExplorer.jsx";
@@ -193,7 +194,7 @@ const COVER_BY_GAME = {
   }
 };
 
-const defaultGameId = "sky-team-2024";
+const defaultGameId = "dito-2026";
 const wizardHatUrl = "https://wizardsoflearning.com/wizards-hat-board-game-design-tools/";
 const assetPath = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, "")}`;
 
@@ -483,7 +484,7 @@ function ExplorerView({ visibleGames, selectedGame, selectedGameId, onSelectGame
       <section className="explorer-panel" aria-label="Award timeline">
         <div className="section-heading">
           <div>
-            <h2>2015-2025 Winner Timeline</h2>
+            <h2>{years[0]}–{years.at(-1)} Winner Timeline</h2>
             <p>Three award lanes, one shared mechanic vocabulary.</p>
           </div>
           <button className="ghost-button" type="button" onClick={onReset}>
@@ -501,7 +502,7 @@ function ExplorerView({ visibleGames, selectedGame, selectedGameId, onSelectGame
 
 function Timeline({ visibleGames, selectedGameId, onSelectGame }) {
   return (
-    <div className="timeline">
+    <div className="timeline" style={{ "--year-count": years.length }}>
       <div className="year-row" aria-hidden="true">
         <span />
         {years.map((year) => (
@@ -651,16 +652,34 @@ function GameDetail({ game }) {
       <div className="detail-title">
         <div>
           <h2>{game.title}</h2>
-          <p>{game.lesson}</p>
+          {!game.evidence && <p>{game.lesson}</p>}
         </div>
         <ChevronRight size={20} />
       </div>
 
+      {game.evidence ? (
+        <>
+          <InfoBlock icon={<Layers3 size={18} />} title="กติกาที่ตรวจได้">
+            <p>{game.evidence.designer} · {game.evidence.players}</p>
+            <p>ฉบับที่ใช้อ้างอิง: {game.evidence.edition}</p>
+            <p>{game.evidence.rules}</p>
+            <p><a href={awardSource2026} target="_blank" rel="noreferrer">ประกาศผลรางวัลทางการ</a></p>
+            <p><a href={game.evidence.rulesUrl} target="_blank" rel="noreferrer">คู่มือกติกา: {game.evidence.sections}</a></p>
+          </InfoBlock>
+          <InfoBlock icon={<Sparkles size={18} />} title="บทวิเคราะห์การออกแบบโดย WoL">
+            <p>{game.lesson}</p>
+            <p>{game.evidence.reasoning}</p>
+            <p><small>อ่านจากกติกา · ยังไม่มีบันทึกทดลองเล่นสำหรับบทวิเคราะห์นี้ ส่วน MAGIC Star, CORE, TASTE และ Table Moment ด้านล่างเป็นการตีความของ WoL</small></p>
+          </InfoBlock>
+        </>
+      ) : (
       <InfoBlock icon={<Sparkles size={18} />} title="Why people want to play">
         <p>
           Players repeat the verb <strong>{game.verb}</strong> because the table moment is <strong>{game.tableMoment}</strong>.
         </p>
       </InfoBlock>
+
+      )}
 
       <InfoBlock icon={<Layers3 size={18} />} title="MAGIC Star">
         <div className="magic-grid">
@@ -697,7 +716,7 @@ function GameDetail({ game }) {
         <p>{game.replayEngine}</p>
       </div>
 
-      <div className="source-card">
+      {!game.evidence && <div className="source-card">
         <span>Cover source</span>
         {(COVER_BY_GAME[game.id]?.source || game.coverSourceUrl) ? (
           <a href={COVER_BY_GAME[game.id]?.source ?? game.coverSourceUrl} target="_blank" rel="noreferrer">
@@ -707,7 +726,7 @@ function GameDetail({ game }) {
           <p>ยังไม่มีแหล่งรูปที่ตรวจสอบได้</p>
         )}
         <CoverStatus game={game} />
-      </div>
+      </div>}
     </aside>
   );
 }

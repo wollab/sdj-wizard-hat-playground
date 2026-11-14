@@ -1,3 +1,5 @@
+import { winners2026 } from "./winners2026.js";
+
 export const awardLanes = [
   { id: "spiel", label: "Spiel", fullName: "Spiel des Jahres", tone: "spiel-red" },
   { id: "kenner", label: "Kenner", fullName: "Kennerspiel des Jahres", tone: "kenner-black" },
@@ -874,6 +876,8 @@ const KNOWN_BGG_IDS = {
   "challengers-2023":           "359970",
   "sky-team-2024":              "397291",
 };
+
+games.push(...winners2026);
 
 games.forEach((game) => {
   const bggId = KNOWN_BGG_IDS[game.id] || null;

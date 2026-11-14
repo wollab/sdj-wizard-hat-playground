@@ -582,7 +582,7 @@ select {
 .year-row,
 .lane-row {
   display: grid;
-  grid-template-columns: 132px repeat(11, minmax(74px, 1fr));
+  grid-template-columns: 132px repeat(var(--year-count, 12), minmax(74px, 1fr));
   gap: 8px;
   align-items: stretch;
 }
